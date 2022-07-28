@@ -16,9 +16,6 @@ def author():
 def get_data(sd, ed):
     """Read stock data (adjusted close) for given symbols from SP500_data."""
 
-    # get date range for df
-    date_range = pd.date_range(sd, ed, freq='MS')
-
     # get data from SP500_data
     data_wrang = SPYdata()
     data_df = data_wrang.get_data()
@@ -26,22 +23,7 @@ def get_data(sd, ed):
     data_df = data_df[(data_df['Date'] >= sd) & (data_df['Date'] <= ed)]
 
     # index df by dates
-    df = pd.DataFrame(data_df['SP500'], columns=['SP500'], index=date_range)
-
-
-
-    # for symbol in symbols:
-    #     df_temp = pd.read_csv(
-    #         symbol_to_path(symbol),
-    #         index_col="Date",
-    #         parse_dates=True,
-    #         usecols=["Date", colname],
-    #         na_values=["nan"],
-    #     )
-    #     df_temp = df_temp.rename(columns={colname: symbol})
-    #     df = df.join(df_temp)
-    #     if symbol == "SPY":  # drop dates SPY did not trade
-    #         df = df.dropna(subset=["SPY"])
+    df = pd.DataFrame(data_df['SP500'].values, columns=['SP500'], index=data_df['Date'])
 
     return df
 
