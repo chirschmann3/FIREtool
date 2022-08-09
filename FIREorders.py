@@ -4,7 +4,8 @@ import datetime as dt
 from dateutil.relativedelta import relativedelta
 
 """Creates df of orders to feed through marketsimcode
-to determine performance for given datas and contributions/spend."""
+to determine performance for given datas and contributions/spend.
+These orders are the cash desired to spend, not the units of stocks to buy."""
 
 def get_orders(sv, age, mon_inv, ret_age, mon_spend, sd):
     """Get orders df to feed through marketsimcode and retrieve portfolio performance.
