@@ -9,27 +9,14 @@ import math
 import pandas as pd
 from SP500_data import SPYdata
 
+
 def author():
     return 'chirschmann3'
 
 
-def get_data(sd, ed):
-    """Read stock data (adjusted close) for given symbols from SP500_data."""
-
-    # get data from SP500_data
-    data_wrang = SPYdata()
-    data_df = data_wrang.get_data()
-    # print(data_df.info())
-    data_df = data_df[(data_df['Date'] >= sd) & (data_df['Date'] <= ed)]
-
-    # index df by dates
-    df = pd.DataFrame(data_df['SP500'].values, columns=['SP500'], index=data_df['Date'])
-
-    return df
-
-
 def compute_portvals(
         orders_df,
+        prices_df,
         sd,
         ed,
         start_val=100000,
@@ -49,25 +36,23 @@ def compute_portvals(
     :return: the result (portvals) as a single-column dataframe, containing the value of the portfolio for each trading order in the first column from start_date to end_date, inclusive.
     :rtype: pandas.DataFrame
     """
-    # get prices of symbols from orders_df list
+    # get symbol from orders_df list
     sym = orders_df.columns[0]
-    date_range = pd.date_range(sd, ed)
-    prices = get_data([sym], date_range)
-    prices.fillna(method='ffill', inplace=True)
-    prices.fillna(method='bfill', inplace=True)
-    # remove SPY column if not in symbols list
-    if 'SPY' not in sym: prices.drop('SPY', inplace=True, axis=1)
+
+    # trim df
+    prices_df = prices_df.ix[sd, ed]
+
     # add 'Cash' column
-    prices['Cash'] = 1.0
+    prices_df['Cash'] = 1.0
 
     # create trades df
-    trades = pd.DataFrame(0.0, columns=prices.columns, index=prices.index)
+    trades = pd.DataFrame(0.0, columns=prices_df.columns, index=prices_df.index)
     # iterate through orders_df to update trades df
     for order in range(orders_df.shape[0]):
         action = orders_df[sym].ix[order]
         trade_date = orders_df.index[order]
         trades[sym].ix[trade_date] += orders_df[sym].ix[order]
-        trades['Cash'].ix[trade_date] -= orders_df[sym].ix[order] * prices[sym].ix[trade_date] * \
+        trades['Cash'].ix[trade_date] -= orders_df[sym].ix[order] * prices_df[sym].ix[trade_date] * \
                                          (1 + impact) + commission
 
 
@@ -80,7 +65,7 @@ def compute_portvals(
 
     # create values df
     values = pd.DataFrame(0.0, columns=holdings.columns, index=holdings.index)
-    values = holdings * prices
+    values = holdings * prices_df
 
     # get daily portfolio values
     port_vals = values.sum(axis=1)
@@ -101,6 +86,4 @@ def find_port_stats(df):
 
 
 if __name__ == "__main__":
-    sd = dt.datetime(2008, 1, 1)
-    ed = dt.datetime(2010, 12, 31)
-    get_data(sd, ed)
+    print("May the force be with you")
