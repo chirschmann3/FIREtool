@@ -6,6 +6,7 @@ from SP500_data import SPYdata
 import pandas as pd
 import numpy as np
 import datetime as dt
+from dateutil.relativedelta import relativedelta
 
 
 def get_data():
@@ -56,7 +57,7 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
 
     # check latest month that information is available for based on 90 year lifespan
     years2live = 90 - age
-    latest_possible_date = prices_df.index[-1] - dt.timedelta(days=(years2live*365))
+    latest_possible_date = prices_df.index[-1] - relativedelta(years=years2live)
 
     # create empty arrays to track results for later statistics
     retire_values = np.empty([1,1])
@@ -68,8 +69,8 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     possible_years = pd.date_range(earliest_date, latest_possible_date, freq='YS')
     for start_year in possible_years:
         # get retire year and death year based on start_year
-        year_retire = start_year + dt.timedelta(days=((ret_age - age) * 365))
-        end_year = start_year + dt.timedelta(days=(years2live*365))
+        year_retire = start_year + relativedelta(years=(ret_age - age))
+        end_year = start_year + relativedelta(years=years2live)
 
         # get orders and portfolio values
         orders = FIRE.get_orders(sv, age, mon_inv, ret_age, mon_spend, start_year)
