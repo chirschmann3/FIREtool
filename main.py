@@ -1,6 +1,6 @@
 """Main file to run iterations of FIRE numbers."""
 
-import FIREorders as orders
+import FIREorders as FIRE
 import marketsimcode as mkt
 from SP500_data import SPYdata
 import pandas as pd
@@ -38,7 +38,18 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     years2live = 90 - age
     latest_possible_date = prices_df.index[-1] - dt.timedelta(days=(years2live*365))
 
-    # iterate through all years from sd to latest possible date
+    # create empty arrays to track results for later statistics
+
+
+    # iterate through all years from data sd to latest possible date
+    earliest_date = prices_df.index[0]
+    possible_years = pd.date_range(earliest_date, latest_possible_date, freq='YS')
+    for start_year in possible_years:
+        # get ed based on start_year
+        end_year = start_year + dt.timedelta(days=(years2live*365))
+        # get orders and portfolio values
+        orders = FIRE.get_orders(sv, age, mon_inv, ret_age, mon_spend, start_year)
+        port_val = mkt.compute_portvals(orders, prices_df, start_year, end_year)
 
 
 
