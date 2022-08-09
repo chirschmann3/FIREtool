@@ -25,7 +25,7 @@ def compute_portvals(
 ):
     """
     Computes the portfolio values.
-    :param orders_df: df of orders_df
+    :param orders_df: df of orders of cash desired to invest
     :type orders_df: pandas.Dataframe
     :param start_val: The starting value of the portfolio
     :type start_val: int
@@ -42,17 +42,21 @@ def compute_portvals(
     # trim df
     prices_df = prices_df.ix[sd: ed]
 
-    # add 'Cash' column
-    prices_df['Cash'] = 1.0
+    # add 'Cash' column with starting value from orders
+    prices_df['Cash'] = orders_df[sym].ix[0]
 
     # create trades df
     trades = pd.DataFrame(0.0, columns=prices_df.columns, index=prices_df.index)
     # iterate through orders_df to update trades df
     for order in range(orders_df.shape[0]):
-        action = orders_df[sym].ix[order]
         trade_date = orders_df.index[order]
-        trades[sym].ix[trade_date] += orders_df[sym].ix[order]
-        trades['Cash'].ix[trade_date] -= orders_df[sym].ix[order] * prices_df[sym].ix[trade_date] * \
+
+        # determine num of shares possible for cash order
+        num_shares = orders_df[sym].ix[order] // prices_df[sym].ix[trade_date]
+
+        # updates trades
+        trades[sym].ix[trade_date] += num_shares
+        trades['Cash'].ix[trade_date] -= num_shares * prices_df[sym].ix[trade_date] * \
                                          (1 + impact) + commission
 
 
