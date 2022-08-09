@@ -1,3 +1,5 @@
+"""Pulls data from online source that returns SP500 info on monthly basis since 1870"""
+
 import datapackage
 import pandas as pd
 
