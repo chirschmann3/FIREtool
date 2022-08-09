@@ -40,7 +40,7 @@ def compute_portvals(
     sym = orders_df.columns[0]
 
     # trim df
-    prices_df = prices_df.ix[sd, ed]
+    prices_df = prices_df.ix[sd: ed]
 
     # add 'Cash' column
     prices_df['Cash'] = 1.0
