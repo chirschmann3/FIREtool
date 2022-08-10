@@ -113,10 +113,19 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     FIRE_ages = FIRE_ages[1:]
     EOL_values = EOL_values[1:]
 
+    # get count of nan FIRE ages and trim from array
+    no_FIRE = np.count_nonzero(np.isnan(FIRE_ages))
+    total_runs = FIRE_ages.size
+    FIRE_ages = FIRE_ages[np.logical_not(np.isnan(FIRE_ages))]
+
     # perform stats of interest on values
     retire_mean_val, FIRE_mean_month, EOL_mean_val = get_mean(retire_values, FIRE_ages, EOL_values)
     retire_std_val, FIRE_std_year, EOL_std_val = get_std(retire_values, FIRE_ages, EOL_values)
     retire_10pct_val, FIRE_10pct_year, EOL_10pct_val = get_10perctl(retire_values, FIRE_ages, EOL_values)
+
+    # return % of years you go broke
+    pct_broke = np.count_nonzero(EOL_values < 1000) / total_runs
+    pct_noFIRE = no_FIRE / total_runs
 
     print('Your avg net worth at retirement is: ' + str(retire_mean_val))
     print('Your avg age of reaching FIRE is : ' + str(FIRE_mean_month))
@@ -127,6 +136,8 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     print('The 10th percentile of net worth at retirement is: ' + str(retire_10pct_val))
     print('The 10th percentile of your age you FIRE is: ' + str(FIRE_10pct_year))
     print('The 10th percentile of your net worth at death is: ' + str(EOL_10pct_val))
+    print('The % of times you went broke is: ' + str(pct_broke))
+    print('The % of time you never reached you FIRE # is: ' + str(pct_noFIRE))
 
     return
 
