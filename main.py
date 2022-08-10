@@ -12,7 +12,7 @@ import matplotlib.dates as mdts
 
 
 def get_data():
-    """Read stock data (adjusted close) for given symbols from SP500_data."""
+    """Read stock data (adjusted close) and dividends for given symbols from SP500_data."""
 
     # get data from SP500_data
     data_wrang = SPYdata()
@@ -22,8 +22,9 @@ def get_data():
 
     # index df by dates
     df = pd.DataFrame(data_df['SP500'].values, columns=['SP500'], index=data_df['Date'])
+    df_div = pd.DataFrame(data_df['Dividend'].values, columns=['Div'], index=data_df['Date'])
 
-    return df
+    return df, df_div
 
 
 def plot_values(df):
@@ -50,9 +51,11 @@ def get_std(ar1, ar2, ar3):
     a3_std = np.std(ar3)
     return a1_std, a2_std, a3_std
 
-def get_10perctl(ar1, ar2, ar3):
+def get_10perctl(ar1, FIar2, ar3):
+    # FIRE age uses the 90th percentile since that is worst case scenario
+    # vs 10th percentile of port values
     a1_pct = np.percentile(ar1, 10)
-    a2_pct = np.percentile(ar2, 10)
+    a2_pct = np.percentile(FIar2, 90)
     a3_pct = np.percentile(ar3, 10)
     return a1_pct, a2_pct, a3_pct
 
@@ -67,10 +70,15 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     :param mon_spend: monthly spend post retirement"""
 
     # get prices_df for all dates available
-    prices_df = get_data()
+    prices_df, div_df = get_data()
 
     # trim data to 1910 and later
     prices_df = prices_df[prices_df.index.year >= 1910]
+    div_df = div_df[div_df.index.year >= 1910]
+
+    # convert interpolated dividends to monthly dividends paid -
+    # this will be low due to interpolation
+    div_df = div_df / 12
 
     # check latest month that information is available for based on 90 year lifespan
     years2live = 90 - age
@@ -91,7 +99,7 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
 
         # get orders and portfolio values
         orders = FIRE.get_orders(sv, age, mon_inv, ret_age, mon_spend, start_year)
-        port_val = mkt.compute_portvals(orders, prices_df, start_year, end_year)
+        port_val = mkt.compute_portvals(orders, prices_df, div_df, start_year, end_year)
 
         # plot potfolio values over time
         plot_values(port_val)
@@ -144,4 +152,4 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
 
 
 if __name__ == "__main__":
-    iterate_code(500000, 30, 5000, 40, 6000)
+    iterate_code(1300000, 30, 10000, 35, 15000)
