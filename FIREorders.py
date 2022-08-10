@@ -39,6 +39,9 @@ def get_orders(sv, age, mon_inv, ret_age, mon_spend, sd):
     for month in range(months2invest+1, months2invest+months2spend):
         orders.ix[month] = -mon_spend
 
+    # trim nan from last month
+    orders.dropna(inplace=True)
+
     return orders
 
 
