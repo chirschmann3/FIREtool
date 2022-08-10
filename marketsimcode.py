@@ -19,7 +19,6 @@ def compute_portvals(
         prices_df,
         sd,
         ed,
-        start_val=100000,
         commission=0.0,
         impact=0.0,
 ):
@@ -43,7 +42,7 @@ def compute_portvals(
     prices_df = prices_df.ix[sd: ed]
 
     # add 'Cash' column with starting value from orders
-    prices_df['Cash'] = orders_df[sym].ix[0]
+    prices_df['Cash'] = 1.0
 
     # create trades df
     trades = pd.DataFrame(0.0, columns=prices_df.columns, index=prices_df.index)
@@ -56,13 +55,12 @@ def compute_portvals(
 
         # updates trades
         trades[sym].ix[trade_date] += num_shares
-        trades['Cash'].ix[trade_date] -= num_shares * prices_df[sym].ix[trade_date] * \
+        trades['Cash'].ix[trade_date] = orders_df[sym].ix[trade_date] - num_shares * prices_df[sym].ix[trade_date] * \
                                          (1 + impact) + commission
 
 
     # create holdings df
     holdings = pd.DataFrame(0.0, columns=trades.columns, index=trades.index)
-    holdings['Cash'].ix[0] = start_val
     holdings.ix[0] += trades.ix[0]
     for trade_date in range(1, trades.shape[0]):
         holdings.ix[trade_date] = holdings.ix[trade_date - 1] + trades.ix[trade_date]
