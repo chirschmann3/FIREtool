@@ -69,6 +69,9 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
     # get prices_df for all dates available
     prices_df = get_data()
 
+    # trim data to 1910 and later
+    prices_df = prices_df[prices_df.index.year >= 1910]
+
     # check latest month that information is available for based on 90 year lifespan
     years2live = 90 - age
     latest_possible_date = prices_df.index[-1] - relativedelta(years=years2live)
