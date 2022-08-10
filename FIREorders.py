@@ -29,7 +29,7 @@ def get_orders(sv, age, mon_inv, ret_age, mon_spend, sd):
     orders = pd.DataFrame(np.nan, columns=['SP500'], index=date_range)
 
     # add starting investment value
-    orders.ix[0] = sv
+    orders.iloc[0] = sv
 
     # loop through investing years and add buy orders to df
     for month in range(1, months2invest+1):

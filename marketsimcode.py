@@ -61,7 +61,7 @@ def compute_portvals(
 
     # create holdings df
     holdings = pd.DataFrame(0.0, columns=trades.columns, index=trades.index)
-    holdings.ix[0] += trades.ix[0]
+    holdings.iloc[0] += trades.iloc[0]
     for trade_date in range(1, trades.shape[0]):
         holdings.ix[trade_date] = holdings.ix[trade_date - 1] + trades.ix[trade_date]
 

@@ -98,7 +98,6 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
 
         # get when hit FIRE number
         FIRE_num = mon_spend * 12 * 25
-        sym = port_val.columns[0]
         if any(port_val >= FIRE_num):
             FIRE_month = port_val[port_val >= FIRE_num].index[0]
             FIRE_age = FIRE_month.year - start_year.year + age
