@@ -28,17 +28,14 @@ def get_data():
 
 def plot_values(df):
     ax = df.plot(label='Portfolio Value over Time')
-    plt.show()
     plt.title('Portfolio Performance Over Time')
     plt.xlabel('Date')
-    xformat = mdts.DateFormatter('%b-%y')
-    ax.xaxis.set_major_formatter(xformat)
-    ax.legend()
+    # xformat = mdts.DateFormatter('%b-%y')
+    # ax.xaxis.set_major_formatter(xformat)
 
     # save graph as png
     filename = "port_perform.png"
     plt.savefig(filename)
-    plt.clf()
 
 
 def get_mean(arr1, arr2, arr3):
@@ -98,34 +95,36 @@ def iterate_code(sv, age, mon_inv, ret_age, mon_spend):
 
         # get when hit FIRE number
         FIRE_num = mon_spend * 12 * 25
-    #     sym = port_val.columns[0]
-    #     FIRE_month = port_val[port_val[sym] >= FIRE_num].index[0]
-    #     FIRE_age = FIRE_month.year - start_year + age
-    #
-    #     # update arrays for later stats
-    #     retire_values.append(port_val.ix[year_retire])
-    #     FIRE_ages.append(FIRE_age)
-    #     EOL_values.append(port_val.ix[end_year])
-    #
-    # # trim first empty value
-    # retire_values = retire_values.ix[1:]
-    # FIRE_ages = FIRE_ages.index[1:]
-    # EOL_values = EOL_values.ix[1:]
-    #
-    # # perform stats of interest on values
-    # retire_mean_val, FIRE_mean_month, EOL_mean_val = get_mean(retire_values, FIRE_ages, EOL_values)
-    # retire_std_val, FIRE_std_year, EOL_std_val = get_std(retire_values, FIRE_ages, EOL_values)
-    # retire_10pct_val, FIRE_10pct_year, EOL_10pct_val = get_10perctl(retire_values, FIRE_ages, EOL_values)
-    #
-    # print('Your avg net worth at retirement is: ' + str(retire_mean_val))
-    # print('Your avg age of reaching FIRE is : ' + str(FIRE_mean_month))
-    # print('Your avg net worth at end of life is: ' + str(EOL_mean_val))
-    # print('The std of your net worth at retirement is: ' + str(retire_std_val))
-    # print("The std of age you reach FIRE is:  " + str(FIRE_std_year))
-    # print('The std of your net worth at death is: ' + str(EOL_std_val))
-    # print('The 10th percentile of net worth at retirement is: ' + str(retire_10pct_val))
-    # print('The 10th percentile of your age you FIRE is: ' + str(FIRE_10pct_year))
-    # print('The 10th percentile of your net worth at death is: ' + str(EOL_10pct_val))
+        sym = port_val.columns[0]
+        if any(port_val >= FIRE_num):
+            FIRE_month = port_val[port_val >= FIRE_num].index[0]
+            FIRE_age = FIRE_month.year - start_year.year + age
+        else: FIRE_age = np.nan
+
+        # update arrays for later stats
+        retire_values = np.append(retire_values, port_val.ix[year_retire])
+        FIRE_ages = np.append(FIRE_ages, FIRE_age)
+        EOL_values = np.append(EOL_values, port_val.ix[end_year])
+
+    # trim first empty value
+    retire_values = retire_values[1:]
+    FIRE_ages = FIRE_ages[1:]
+    EOL_values = EOL_values[1:]
+
+    # perform stats of interest on values
+    retire_mean_val, FIRE_mean_month, EOL_mean_val = get_mean(retire_values, FIRE_ages, EOL_values)
+    retire_std_val, FIRE_std_year, EOL_std_val = get_std(retire_values, FIRE_ages, EOL_values)
+    retire_10pct_val, FIRE_10pct_year, EOL_10pct_val = get_10perctl(retire_values, FIRE_ages, EOL_values)
+
+    print('Your avg net worth at retirement is: ' + str(retire_mean_val))
+    print('Your avg age of reaching FIRE is : ' + str(FIRE_mean_month))
+    print('Your avg net worth at end of life is: ' + str(EOL_mean_val))
+    print('The std of your net worth at retirement is: ' + str(retire_std_val))
+    print("The std of age you reach FIRE is:  " + str(FIRE_std_year))
+    print('The std of your net worth at death is: ' + str(EOL_std_val))
+    print('The 10th percentile of net worth at retirement is: ' + str(retire_10pct_val))
+    print('The 10th percentile of your age you FIRE is: ' + str(FIRE_10pct_year))
+    print('The 10th percentile of your net worth at death is: ' + str(EOL_10pct_val))
 
     return
 
