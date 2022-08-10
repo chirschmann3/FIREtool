@@ -41,7 +41,7 @@ def compute_portvals(
     div_df = div_df.ix[sd: ed]
 
     # add 'Cash' column with starting value from orders
-    prices_df['Cash'] = 1.0
+    prices_df['Cash'].iloc[:] = 1.0
 
     # create trades df
     trades = pd.DataFrame(0.0, columns=prices_df.columns, index=prices_df.index)
